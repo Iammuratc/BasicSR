@@ -14,6 +14,10 @@ def l1_loss(pred, target):
     return F.l1_loss(pred, target, reduction='none')
 
 
+# def adjust_target(pred,target):
+#     return F.interpolate(pred, size=target.size, mode='bilinear', align_corners=False)
+
+
 @weighted_loss
 def mse_loss(pred, target):
     return F.mse_loss(pred, target, reduction='none')
