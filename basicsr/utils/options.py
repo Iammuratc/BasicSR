@@ -100,12 +100,12 @@ def parse_options(root_path, is_train=True):
     parser = argparse.ArgumentParser()
     parser.add_argument('--opt', type=str, required=True, help='Path to option YAML file.')
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm'], default='none', help='job launcher')
-    parser.add_argument('--auto_resume', action='store_true')
+    parser.add_argument('--auto-resume', action='store_true')
     parser.add_argument('--debug', action='store_true')
     # parser.add_argument('--local-rank', type=int, default=0)
     parser.add_argument('--local-rank', default=os.environ['LOCAL_RANK'])
     parser.add_argument(
-        '--force_yml', nargs='+', default=None, help='Force to update yml files. Examples: train:ema_decay=0.999')
+        '--force-yml', nargs='+', default=None, help='Force to update yml files. Examples: train:ema_decay=0.999')
     args = parser.parse_args()
 
     # parse yml to dict
@@ -217,3 +217,64 @@ def copy_opt_file(opt_file, experiments_root):
         lines.insert(0, f'# GENERATE TIME: {time.asctime()}\n# CMD:\n# {cmd}\n\n')
         f.seek(0)
         f.writelines(lines)
+
+
+def parse(opt_path, is_train=True):
+    """Parse option file.
+
+    Args:
+        opt_path (str): Option file path.
+        is_train (str): Indicate whether in training or not. Default: True.
+
+    Returns:
+        (dict): Options.
+    """
+    with open(opt_path, mode='r') as f:
+        Loader, _ = ordered_yaml()
+        opt = yaml.load(f, Loader=Loader)
+
+    opt['is_train'] = is_train
+
+    # datasets
+    for phase, dataset in opt['datasets'].items():
+        # for several datasets, e.g., test_1, test_2
+        phase = phase.split('_')[0]
+        dataset['phase'] = phase
+        if 'scale' in opt:
+            dataset['scale'] = opt['scale']
+        if dataset.get('dataroot_gt') is not None:
+            dataset['dataroot_gt'] = osp.expanduser(dataset['dataroot_gt'])
+        if dataset.get('dataroot_lq') is not None:
+            dataset['dataroot_lq'] = osp.expanduser(dataset['dataroot_lq'])
+
+    # paths
+    for key, val in opt['path'].items():
+        if (val is not None) and ('resume_state' in key
+                                  or 'pretrain_network' in key):
+            opt['path'][key] = osp.expanduser(val)
+    opt['path']['root'] = osp.abspath(
+        osp.join(__file__, osp.pardir, osp.pardir, osp.pardir))
+    if is_train:
+        experiments_root = osp.join(opt['path']['root'], 'experiments',
+                                    opt['name'])
+        opt['path']['experiments_root'] = experiments_root
+        opt['path']['models'] = osp.join(experiments_root, 'models')
+        opt['path']['training_states'] = osp.join(experiments_root,
+                                                  'training_states')
+        opt['path']['log'] = experiments_root
+        opt['path']['visualization'] = osp.join(experiments_root,
+                                                'visualization')
+
+        # change some options for debug mode
+        if 'debug' in opt['name']:
+            if 'val' in opt:
+                opt['val']['val_freq'] = 8
+            opt['logger']['print_freq'] = 1
+            opt['logger']['save_checkpoint_freq'] = 8
+    else:  # test
+        results_root = osp.join(opt['path']['root'], 'results', opt['name'])
+        opt['path']['results_root'] = results_root
+        opt['path']['log'] = results_root
+        opt['path']['visualization'] = osp.join(results_root, 'visualization')
+
+    return opt
