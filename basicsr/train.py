@@ -187,10 +187,14 @@ def train_pipeline(root_path):
 
             # validation
             if opt.get('val') is not None and (current_iter % opt['val']['val_freq'] == 0):
+                rgb2bgr = opt['val'].get('rgb2bgr', True)
+                # wheather use uint8 image to compute metrics
+                use_image = opt['val'].get('use_image', True)
+
                 if len(val_loaders) > 1:
                     logger.warning('Multiple validation datasets are *only* supported by SRModel.')
                 for val_loader in val_loaders:
-                    model.validation(val_loader, current_iter, tb_logger, opt['val']['save_img'])
+                    model.validation(val_loader, current_iter, tb_logger, opt['val']['save_img'], rgb2bgr, use_image)
 
             data_timer.start()
             iter_timer.start()
