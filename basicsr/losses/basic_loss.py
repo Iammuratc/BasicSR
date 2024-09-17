@@ -185,6 +185,7 @@ class PerceptualLoss(nn.Module):
         self.layer_weights = layer_weights
         self.vgg = VGGFeatureExtractor(
             layer_name_list=list(layer_weights.keys()),
+            # layer_name_list=layer_weights,
             vgg_type=vgg_type,
             use_input_norm=use_input_norm,
             range_norm=range_norm)
@@ -239,7 +240,7 @@ class PerceptualLoss(nn.Module):
         else:
             style_loss = None
 
-        return percep_loss, style_loss
+        return percep_loss#, style_loss
 
     def _gram_mat(self, x):
         """Calculate Gram matrix.

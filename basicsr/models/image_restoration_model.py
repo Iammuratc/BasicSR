@@ -256,13 +256,13 @@ class ImageCleanModel(BaseModel):
 
                     save_img_path = osp.join(self.opt['path']['visualization'],
                         img_name,
-                        f'{img_name}_{current_iter}.png')
+                        f'{current_iter}.png')
                     save_gt_img_path = osp.join(self.opt['path']['visualization'],
                         img_name,
-                        f'{img_name}_gt.png')
+                        f'gt.png')
                     save_input_img_path = osp.join(
                         self.opt['path']['visualization'], img_name,
-                        f'{img_name}_input.png')
+                        f'input.png')
                 else:
 
                     save_img_path = osp.join(
