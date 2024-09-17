@@ -6,7 +6,7 @@ from torchvision.models import vgg as vgg
 
 from basicsr.utils.registry import ARCH_REGISTRY
 
-VGG_PRETRAIN_PATH = 'experiments/pretrained_models/vgg19-dcbb9e9d.pth'
+VGG_PRETRAIN_PATH = '/home/murat/Projects/BasicSR/experiments/pretrained_models/vgg19/vgg19-dcbb9e9d.pth'
 NAMES = {
     'vgg11': [
         'conv1_1', 'relu1_1', 'pool1', 'conv2_1', 'relu2_1', 'pool2', 'conv3_1', 'relu3_1', 'conv3_2', 'relu3_2',
