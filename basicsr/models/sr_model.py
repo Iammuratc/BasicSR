@@ -177,11 +177,11 @@ class SRModel(BaseModel):
 
         self.output = output.mean(dim=0, keepdim=True)
 
-    def dist_validation(self, dataloader, current_iter, tb_logger, save_img):
+    def dist_validation(self, dataloader, current_iter, tb_logger, save_img, rgb2bgr=False, use_image=False):
         if self.opt['rank'] == 0:
-            self.nondist_validation(dataloader, current_iter, tb_logger, save_img)
+            self.nondist_validation(dataloader, current_iter, tb_logger, save_img, rgb2bgr, use_image)
 
-    def nondist_validation(self, dataloader, current_iter, tb_logger, save_img):
+    def nondist_validation(self, dataloader, current_iter, tb_logger, save_img, rgb2bgr, use_image):
         dataset_name = dataloader.dataset.opt['name']
         with_metrics = self.opt['val'].get('metrics') is not None
         use_pbar = self.opt['val'].get('pbar', False)
@@ -205,6 +205,7 @@ class SRModel(BaseModel):
             self.test()
 
             visuals = self.get_current_visuals()
+            input_img = tensor2img([visuals['lq']], rgb2bgr=rgb2bgr)
             sr_img = tensor2img([visuals['result']])
             metric_data['img'] = sr_img
             if 'gt' in visuals:
@@ -218,18 +219,41 @@ class SRModel(BaseModel):
             torch.cuda.empty_cache()
 
             if save_img:
-                if self.opt['is_train']:
-                    save_img_path = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}.png')
-                else:
-                    if self.opt['val']['suffix']:
-                        save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
-                                                 f'{img_name}_{self.opt["val"]["suffix"]}.png')
-                    else:
-                        save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
-                                                 f'{img_name}_{self.opt["name"]}.png')
-                imwrite(sr_img, save_img_path)
+                # if self.opt['is_train']:
+                #     save_img_path = osp.join(self.opt['path']['visualization'], img_name,
+                #                              f'{img_name}_{current_iter}.png')
+                # else:
+                #     if self.opt['val']['suffix']:
+                #         save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
+                #                                  f'{img_name}_{self.opt["val"]["suffix"]}.png')
+                #     else:
+                #         save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
+                #                                  f'{img_name}_{self.opt["name"]}.png')
+                # imwrite(sr_img, save_img_path)
+                # if self.opt['is_train']:
+                save_img_path = osp.join(self.opt['path']['visualization'],
+                    img_name,
+                    f'{current_iter}.png')
+                save_gt_img_path = osp.join(self.opt['path']['visualization'],
+                    img_name,
+                    f'gt.png')
+                save_input_img_path = osp.join(
+                    self.opt['path']['visualization'], img_name,
+                    f'input.png')
+                # else:
 
+                #     save_img_path = osp.join(
+                #         self.opt['path']['visualization'], img_name,
+                #         f'{current_iter}.png')
+                #     save_gt_img_path = osp.join(
+                #         self.opt['path']['visualization'], img_name,
+                #         f'gt.png')
+                #     save_input_img_path = osp.join(
+                #         self.opt['path']['visualization'], img_name,
+                #         f'input.png')
+                imwrite(sr_img, save_img_path)
+                imwrite(gt_img, save_gt_img_path)
+                imwrite(input_img, save_input_img_path)
             if with_metrics:
                 # calculate metrics
                 for name, opt_ in self.opt['val']['metrics'].items():
