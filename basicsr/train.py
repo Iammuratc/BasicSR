@@ -191,7 +191,7 @@ def train_pipeline(root_path):
             # validation
             if opt.get('val') is not None and (current_iter % opt['val']['val_freq'] == 0):
                 rgb2bgr = opt['val'].get('rgb2bgr', True)
-                # wheather use uint8 image to compute metrics
+                # whether use uint8 image to compute metrics
                 use_image = opt['val'].get('use_image', True)
 
                 if len(val_loaders) > 1:

@@ -128,7 +128,7 @@ def create_train_val_dataloader(opt, logger):
 
 
 def main():
-    # parse options, set distributed setting, set ramdom seed
+    # parse options, set distributed setting, set random seed
     opt = parse_options(is_train=True)
 
     torch.backends.cudnn.benchmark = True
@@ -291,7 +291,7 @@ def main():
             if opt.get('val') is not None and (current_iter %
                                                opt['val']['val_freq'] == 0):
                 rgb2bgr = opt['val'].get('rgb2bgr', True)
-                # wheather use uint8 image to compute metrics
+                # whether use uint8 image to compute metrics
                 use_image = opt['val'].get('use_image', True)
                 model.validation(val_loader, current_iter, tb_logger,
                                  opt['val']['save_img'], rgb2bgr, use_image )

@@ -31,7 +31,7 @@
 
 ---
 
-BasicSR (**Basic** **S**uper **R**estoration) 是一个基于 PyTorch 的开源图像视频复原工具箱, 比如 超分辨率, 去噪, 去模糊, 去 JPEG 压缩噪声等.
+BasicSR (**Basic** **S**super **R**restoration) 是一个基于 PyTorch 的开源图像视频复原工具箱, 比如 超分辨率, 去噪, 去模糊, 去 JPEG 压缩噪声等.
 
 :triangular_flag_on_post: **新的特性/更新**
 
