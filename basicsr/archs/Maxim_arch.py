@@ -636,7 +636,7 @@ class Maxim(nn.Module):  #input shape: n, c, h, w
         layer.
       use_cross_gating: whether to use the cross-gating MLP block (CGB) in the
         skip connections and multi-stage feature fusion layers.
-      high_res_stages: how many stages are specificied as high-res stages. The
+      high_res_stages: how many stages are specified as high-res stages. The
         rest (depth - high_res_stages) are called low_res_stages.
       block_size_hr: the block_size parameter for high-res stages.
       block_size_lr: the block_size parameter for low-res stages.
