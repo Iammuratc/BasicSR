@@ -7,13 +7,16 @@ import os
 import torch
 from torch.nn import functional as F
 
+from basicsr.data.transforms import augment
 from basicsr.archs.swinir_arch import SwinIR
+from basicsr.utils.options import yaml_load
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, default='datasets/Set5/LRbicx4', help='input test image folder')
     parser.add_argument('--output', type=str, default='results/SwinIR/Set5', help='output folder')
+    parser.add_argument('--gt-folder', type=str, help='ground truth folder')
     parser.add_argument(
         '--task',
         type=str,
@@ -26,11 +29,15 @@ def main():
     parser.add_argument('--noise', type=int, default=15, help='noise level: 15, 25, 50')
     parser.add_argument('--jpeg', type=int, default=40, help='scale factor: 10, 20, 30, 40')
     parser.add_argument('--large_model', action='store_true', help='Use large model, only used for real image sr')
+    parser.add_argument('--opt', type=str, required=True, help='Path to option YAML file.')
     parser.add_argument(
         '--model_path',
         type=str,
         default='experiments/pretrained_models/SwinIR/001_classicalSR_DF2K_s64w8_SwinIR-M_x4.pth')
     args = parser.parse_args()
+
+
+    opt = yaml_load(args.opt)
 
     os.makedirs(args.output, exist_ok=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -46,13 +53,26 @@ def main():
 
     for idx, path in enumerate(sorted(glob.glob(os.path.join(args.input, '*')))):
         # read image
-        imgname = os.path.splitext(os.path.basename(path))[0]
+        img_file_name = os.path.basename(path)
+        imgname = os.path.splitext(img_file_name)[0]
+        pred_folder = os.path.join(args.output,imgname)
+        os.makedirs(pred_folder,exist_ok=True)
         print('Testing', idx, imgname)
         # read image
-        img = cv2.imread(path, cv2.IMREAD_COLOR).astype(np.float32) / 255.
-        img = torch.from_numpy(np.transpose(img[:, :, [2, 1, 0]], (2, 0, 1))).float()
-        img = img.unsqueeze(0).to(device)
+        img_lq = cv2.imread(path, cv2.IMREAD_COLOR)
+        cv2.imwrite(os.path.join(pred_folder, 'input_wo_noise.png'), img_lq)
 
+        # Gt image
+        img_gt = cv2.imread(os.path.join(args.gt_folder,img_file_name))
+        cv2.imwrite(os.path.join(pred_folder, 'gt_wo_noise.png'), img_gt)
+
+        img_gt, img_lq = augment([img_gt, img_lq], opt=opt['datasets']['train'])
+        cv2.imwrite(os.path.join(pred_folder, 'input.png'), img_lq)
+        cv2.imwrite(os.path.join(pred_folder, 'gt.png'), img_gt)
+
+        img_lq = img_lq.astype(np.float32) / 255.
+        img = torch.from_numpy(np.transpose(img_lq[:, :, [2, 1, 0]], (2, 0, 1))).float()
+        img = img.unsqueeze(0).to(device)
         # inference
         with torch.no_grad():
             # pad input image to be a multiple of window_size
@@ -73,7 +93,7 @@ def main():
         if output.ndim == 3:
             output = np.transpose(output[[2, 1, 0], :, :], (1, 2, 0))
         output = (output * 255.0).round().astype(np.uint8)
-        cv2.imwrite(os.path.join(args.output, f'{imgname}_SwinIR.png'), output)
+        cv2.imwrite(os.path.join(pred_folder, f'pred.png'), output)
 
 
 def define_model(args):

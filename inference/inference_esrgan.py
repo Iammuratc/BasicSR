@@ -1,6 +1,5 @@
 import argparse
 import cv2
-import glob
 import numpy as np
 import os
 import torch
@@ -40,7 +39,8 @@ def main():
         for file_path in os.listdir(opt['datasets']['val']['dataroot_lq'])
         if os.path.isfile(os.path.join(opt['datasets']['val']['dataroot_lq'], file_path))])
     for path in image_paths:
-        imgname = os.path.splitext(os.path.basename(path))[0]
+        # imgname = os.path.splitext(os.path.basename(path))[0]
+        imgname = os.path.basename(path)
         pred_folder = os.path.join(args.output,imgname)
         os.makedirs(pred_folder,exist_ok=True)
         print('Testing', imgname)
@@ -51,7 +51,7 @@ def main():
         img_lq = cv2.imread(path, cv2.IMREAD_COLOR)
         cv2.imwrite(os.path.join(pred_folder, 'input_wo_noise.png'), img_lq)
 
-        img_gt = cv2.imread(os.path.join(opt['datasets']['val']['dataroot_gt'],f'{imgname}.png'))
+        img_gt = cv2.imread(os.path.join(opt['datasets']['val']['dataroot_gt'],imgname))
         cv2.imwrite(os.path.join(pred_folder, 'gt_wo_noise.png'), img_gt)
         # Apply augmentations
         img_gt, img_lq = augment([img_gt, img_lq], opt=opt['datasets']['train'])

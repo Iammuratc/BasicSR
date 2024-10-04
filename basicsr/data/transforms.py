@@ -115,11 +115,11 @@ def augment(imgs, opt, flows=None, return_status=False):
 
     """
     hflip = opt['use_hflip'] and random.random() < 0.5
-    vflip = opt['use_rot'] and random.random() < 0.5
+    vflip = opt['use_vflip'] and random.random() < 0.5
     rot90 = opt['use_rot'] and random.random() < 0.5
     local_distortion = opt['add_local_distortion'] and random.random() < 0.5
     noise = opt['add_noise'] and random.random() < 0.5
-    blur = opt['add_blur'] and random.random() < 0.5
+    blur = opt['add_blur'] #and random.random() < 0.5
 
     def _augment_geometric(img):
         if hflip:  # horizontal
@@ -211,7 +211,7 @@ def add_gaussian_noise(img, mean=0, var=0.01):
     noisy_image = np.uint8(noisy_image * 255)
     return noisy_image
 
-def add_gaussian_blur(img,kernel_size=(5,5),sigma=0):
+def add_gaussian_blur(img,kernel_size=(15,15),sigma=0):
     # Define the kernel size and standard deviation for Gaussian blur
     ## sigma: Standard deviation in X and Y direction; 0 lets OpenCV compute it based on kernel size
 

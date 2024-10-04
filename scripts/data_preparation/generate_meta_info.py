@@ -1,15 +1,25 @@
 from os import path as osp
 from PIL import Image
-
+import argparse
 from basicsr.utils import scandir
 
+def get_args():
 
-def generate_meta_info_div2k():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gt-folder', type=str, help='gt image folder')
+    parser.add_argument('--output-path', type=str, help='Path to output meta info txt file.')
+    args = parser.parse_args()
+    return args
+
+
+
+
+def generate_meta_info_div2k(args):
     """Generate meta info for DIV2K dataset.
     """
 
-    gt_folder = 'datasets/DIV2K/DIV2K_train_HR_sub/'
-    meta_info_txt = 'basicsr/data/meta_info/meta_info_DIV2K800sub_GT.txt'
+    gt_folder = args.gt_folder # 'datasets/DIV2K/DIV2K_train_HR_sub/'
+    meta_info_txt = args.output_path # 'basicsr/data/meta_info/meta_info_DIV2K800sub_GT.txt'
 
     img_list = sorted(list(scandir(gt_folder)))
 
@@ -31,4 +41,6 @@ def generate_meta_info_div2k():
 
 
 if __name__ == '__main__':
-    generate_meta_info_div2k()
+    # generate_meta_info_div2k()
+    args = get_args()
+    generate_meta_info_div2k(args)
