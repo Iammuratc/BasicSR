@@ -149,7 +149,7 @@ class CosineAnnealingRestartLR(_LRScheduler):
         periods (list): Period for each cosine anneling cycle.
         restart_weights (list): Restart weights at each restart iteration.
             Default: [1].
-        eta_min (float): The mimimum lr. Default: 0.
+        eta_min (float): The minimum lr. Default: 0.
         last_epoch (int): Used in _LRScheduler. Default: -1.
     """
 
@@ -196,7 +196,7 @@ class CosineAnnealingRestartCyclicLR(_LRScheduler):
         periods (list): Period for each cosine anneling cycle.
         restart_weights (list): Restart weights at each restart iteration.
             Default: [1].
-        eta_min (float): The mimimum lr. Default: 0.
+        eta_min (float): The minimum lr. Default: 0.
         last_epoch (int): Used in _LRScheduler. Default: -1.
     """
 

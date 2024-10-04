@@ -32,7 +32,7 @@ def create_model(opt):
     """Create model.
 
     Args:
-        opt (dict): Configuration. It constains:
+        opt (dict): Configuration. It contains:
             model_type (str): Model type.
     """
     model_type = opt['model_type']

@@ -105,7 +105,7 @@ def create_dataset(dataset_opt):
     """Create dataset.
 
     Args:
-        dataset_opt (dict): Configuration for dataset. It constains:
+        dataset_opt (dict): Configuration for dataset. It contains:
             name (str): Dataset name.
             type (str): Dataset type.
     """
